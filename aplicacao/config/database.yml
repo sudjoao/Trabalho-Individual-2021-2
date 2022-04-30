@@ -9,11 +9,15 @@ default: &default
 development:
   <<: *default
   database: biblioteca_pessoal_development
+  username: postgres
+  password: postgres
 
 
 test:
   <<: *default
   database: biblioteca_pessoal_test
+  username: postgres
+  password: postgres
 
 
 production:
