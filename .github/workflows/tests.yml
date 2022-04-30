@@ -19,7 +19,7 @@ jobs:
           ruby-version: '3.0.0'
       - name: Install dependencies
         run: bundle install
+        working-directory: ./aplicacao
       - name: Run tests
         run: bundle exec rake
-      with:
-        paths: '["aplicacao/**"]'
+        working-directory: ./aplicacao
