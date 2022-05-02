@@ -1,25 +1,39 @@
-name: Ruby
-
+name: gces-aplicao-docker-ci
 on:
   push:
-    branches: [ main ]
+    branches: "main"
+
   pull_request:
-    branches: [ main ]
+    branches: "main"
+defaults:
+  run:
+    working-directory: ./aplicacao
 
 jobs:
-  test:
-
+  build:
+    name: build-container
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v3
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@359bebbc29cbe6c87da6bc9ea3bc930432750108
-        with:
-          ruby-version: '3.0.0'
-      - name: Install dependencies
-        run: bundle install
-        working-directory: ./aplicacao
+      - name: BUild and up docker containers
+        run: docker-compose up --build -d
+
+  run-tests:
+    name: run-rails-tests
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Restart rails db
+        run: docker-compose run web rails db:reset
+
       - name: Run tests
-        run: bundle exec rake
-        working-directory: ./aplicacao
+        run: docker-compose run web rspec
+
+  run-lint:
+    name: run-rails-lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run lint
+        run: docker-compose run web bash -c "gem install rubocop; rubocop -A --fail-level F"
